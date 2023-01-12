@@ -6,7 +6,9 @@ const TestController = {
 
 function test(req,res) {
     try {
-        res.json(TestService.test()).status(200);
+        const db = req.app.get('db');
+        TestService.test(db)
+        res.redirect('/');
     }
     catch (e) {
         res.json({errors: "Test error",status: 400}).status(200);

@@ -10,6 +10,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
     .then(client => {
         console.log('Connected to Database ...');
         const db = client.db('m1p10mean');
+        app.set('db', db);
 
         /* Middlewares */
         app.use(bodyParser.urlencoded({extended: true}));
