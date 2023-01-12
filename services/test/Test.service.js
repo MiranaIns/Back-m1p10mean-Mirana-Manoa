@@ -1,10 +1,12 @@
 const TestService = {
     test: test
 }
+const collectionName = 'test';
 
-function test(){
+function test(db){
     try {
-        return {test : 'Hello World'}
+        const collection = db.collection(collectionName);
+        collection.insertOne({test : 'Hello World 3'});
     }
     catch (e){
         throw { error : 'Hello World Error'};
