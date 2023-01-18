@@ -1,12 +1,24 @@
-const TestService = {
-    test: test
-}
-const collectionName = 'test';
+const bcrypt = require('bcrypt');
 
-function test(db){
+const TestService = {
+    register: register
+}
+const collectionName = 'utilisateur_connexion';
+
+function register(db, mail, mdp){
     try {
         const collection = db.collection(collectionName);
-        collection.insertOne({test : 'Hello World 3'});
+        let email = mail;
+        let motDePasse = mdp;
+        const salt = bcrypt.genSaltSync();
+        const hash = bcrypt.hashSync(motDePasse,salt);
+        collection.insertOne(
+            {
+                "utilisateur_connexion_mail" : email,
+                "utilisateur_connexion_mdp_hash" : hash,
+                "utilisateur_connexion_mdp_salt" : salt
+            }
+        );
     }
     catch (e){
         throw { error : 'Hello World Error'};
