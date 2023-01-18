@@ -13,7 +13,7 @@ async function login(db, mail, motDePasse){
         if(utilisateurConnexion.utilisateur_connexion_mdp_hash === motDePasseHash){
             return TokenService.generateAuthTokens(utilisateurConnexion);
         }
-        else throw new Error("Wrong Password");
+        else throw new Error("Invalid email or password");
     }
     catch(err){
         throw err;

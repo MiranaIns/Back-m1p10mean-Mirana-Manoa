@@ -12,7 +12,7 @@ async function findUtilisateurConnexionByEmail(db, mail){
                 reject(err);
             }
             if(!utilisateurConnexion) {
-                reject(new Error("User not found"));
+                reject(new Error("Invalid email or password"));
             }
             resolve(utilisateurConnexion);
         });
