@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const MongoClient = require('mongodb').MongoClient
 const app = express();
 const configureRouter = require('./config/router.config')
@@ -15,6 +16,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         /* Middlewares */
         app.use(bodyParser.urlencoded({extended: true}));
         app.use(bodyParser.json());
+        app.use(cors());
 
         /* Router */
         configureRouter(app);
