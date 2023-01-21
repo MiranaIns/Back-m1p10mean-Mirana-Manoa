@@ -6,9 +6,8 @@ const TestController = {
 
 function test(req,res) {
     try {
-        const db = req.app.get('db');
         let {mail, mdp} = req.body;
-        TestService.register(db, mail, mdp);
+        TestService.register(mail, mdp);
         res.redirect('/');
     }
     catch (e) {

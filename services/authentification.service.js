@@ -6,9 +6,9 @@ const AuthentificationService = {
     login : login
 };
 
-async function login(db, mail, motDePasse){
+async function login(mail, motDePasse){
     try{
-        let utilisateurConnexion = await UtilisateurConnexionService.findUtilisateurConnexionByEmail(db, mail.toLowerCase());
+        let utilisateurConnexion = await UtilisateurConnexionService.findUtilisateurConnexionByEmail(mail.toLowerCase());
         let motDePasseHash = bcrypt.hashSync(motDePasse,utilisateurConnexion.utilisateur_connexion_mdp_hash);
         if(utilisateurConnexion.utilisateur_connexion_mdp_hash === motDePasseHash){
             return TokenService.generateAuthTokens(utilisateurConnexion);
