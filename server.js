@@ -4,10 +4,6 @@ const cors = require('cors');
 const MongoClient = require('mongodb').MongoClient
 const app = express();
 const configureRouter = require('./config/router.config')
-const notFoundMiddleware = require("../middlewares/notFound.middleware");
-const errorMiddleware = require("../middlewares/error.middleware");
-const passport = require('passport');
-const { jwtStrategy } = require('../config/passport.config');
 
 /* Middlewares */
 app.use(bodyParser.urlencoded({extended: true}));
