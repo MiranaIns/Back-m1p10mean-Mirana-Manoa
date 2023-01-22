@@ -11,7 +11,8 @@ async function login(mail, motDePasse){
         let utilisateurConnexion = await UtilisateurConnexionService.findUtilisateurConnexionByEmail(mail.toLowerCase());
         let motDePasseHash = bcrypt.hashSync(motDePasse,utilisateurConnexion.utilisateur_connexion_mdp_hash);
         if(utilisateurConnexion.utilisateur_connexion_mdp_hash === motDePasseHash){
-            return TokenService.generateAuthTokens(utilisateurConnexion);
+            let utilisateur = await UtilisateurConnexionService.findUtilisateurByUtilisateurConnexionId(utilisateurConnexion._id);
+            return TokenService.generateAuthTokens(utilisateur);
         }
         else throw new Error("Invalid email or password");
     }
