@@ -5,7 +5,7 @@ const verifyCallback = (req, resolve, reject, requiredRights) => async (err, use
   if (err || info || !user) {
     return reject({status: httpStatus.UNAUTHORIZED,message: 'Please authenticate'});
   }
-  req.user = user;
+  req.utilisateur = user;
   if (requiredRights&&requiredRights.length) {
     
   }
