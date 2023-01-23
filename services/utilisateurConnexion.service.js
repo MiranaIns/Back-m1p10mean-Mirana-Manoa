@@ -1,9 +1,11 @@
 const Database = require('../database');
 const Constant = require("../utils/constant.util");
+const bcrypt = require("bcrypt");
 
 const UtilisateurConnexionService = {
     findUtilisateurConnexionByEmail,
-    findUtilisateurByUtilisateurConnexionId
+    findUtilisateurByUtilisateurConnexionId,
+    create
 };
 
 const db = Database.getInstance();
@@ -20,7 +22,7 @@ async function findUtilisateurConnexionByEmail(mail){
                         reject(err);
                     }
                     if (!utilisateurConnexion) {
-                        reject(new Error("Invalid email or password"));
+                        resolve(null);
                     }
                     resolve(utilisateurConnexion);
                 });
@@ -47,6 +49,28 @@ async function findUtilisateurByUtilisateurConnexionId(idUtilisateurConnection){
                     resolve(utilisateur);
                 });
             });
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+function create( mail, salt, hash, session = undefined){
+    try {
+        let options = {};
+        if(session) {
+            options["session"] = session;
+        }
+        return db.then(async (db) => {
+            const collection = db.collection(collectionName);
+            const insertResult = await collection.insertOne({
+                "utilisateur_connexion_mail": mail,
+                "utilisateur_connexion_mdp_hash": hash,
+                "utilisateur_connexion_mdp_salt": salt
+            },
+            { options });
+            return insertResult.insertedId;
         });
     }
     catch (e){

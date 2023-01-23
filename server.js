@@ -12,6 +12,7 @@ const { jwtStrategy } = require('./config/passport.config');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(cors());
+app.options('*',cors());
 
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);

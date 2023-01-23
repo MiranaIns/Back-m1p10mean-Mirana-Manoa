@@ -3,14 +3,14 @@ const {MongoClient} = require("mongodb");
 class PrivateSingleton {
     constructor() {
         const connectionString = 'mongodb+srv://mongo:mongo@cluster0.ih3purh.mongodb.net/?retryWrites=true&w=majority'
-        let db;
+        let cl;
         async function connectToDB(){
             const client = await MongoClient.connect(connectionString, { useUnifiedTopology: true });
-            db = client.db('m1p10mean');
-            return db;
+            cl = client;
+            return cl;
         }
         let result = connectToDB();
-        this.db = result;
+        this.client = result;
     }
 }
 class Database {
@@ -20,7 +20,16 @@ class Database {
         if (!Database.db) {
             Database.db = new PrivateSingleton();
         }
-        return Database.db.db;
+        return Database.db.client.then(client => {
+            return client.db('m1p10mean');
+        });
+    }
+
+    static getMongoClient() {
+        if (!Database.db) {
+            Database.db = new PrivateSingleton();
+        }
+        return Database.db.client;
     }
 }
 module.exports = Database;
