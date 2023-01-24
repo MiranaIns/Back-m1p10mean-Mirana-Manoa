@@ -6,7 +6,7 @@ const configureRouter = require('./config/router.config')
 const notFoundMiddleware = require("./middlewares/notFound.middleware");
 const errorMiddleware = require("./middlewares/error.middleware");
 const passport = require('passport');
-const { jwtStrategy, jwtStrategyRat } = require('./config/passport.config');
+const { jwtStrategy, jwtStrategyRat, jwtStrategyRfi } = require('./config/passport.config');
 
 /* Middlewares */
 app.use(bodyParser.urlencoded({extended: true}));
@@ -17,6 +17,7 @@ app.options('*',cors());
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
 passport.use('jwtRat', jwtStrategyRat);
+passport.use('jwtRfi', jwtStrategyRfi);
 /* Router */
 configureRouter(app);
 
