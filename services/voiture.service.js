@@ -1,5 +1,6 @@
 const Database = require('../database');
 const Constant = require("../utils/constant.util");
+const {ObjectId} = require("mongodb");
 
 const VoitureService = {
     findAllVoiture
@@ -9,11 +10,11 @@ const db = Database.getInstance();
 
 const collectionName = 'voiture';
 
-async function findAllVoiture(){
+async function findAllVoiture(user){
     try {
         return db.then((db) => {
             const collection = db.collection(collectionName);
-            return collection.find().toArray().then(results => {
+            return collection.find({"fk_utilisateur_id": ObjectId(user._id)}).toArray().then(results => {
                 return results;
             });
         });
