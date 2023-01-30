@@ -13,7 +13,11 @@ const VoitureController = {
     ajoutVoitureClient,
     depotVoitureGarage,
     findAllVoitureGarage,
-    ajoutVoitureDevis
+    ajoutVoitureDevis,
+    findDetailsVoitureDevis,
+    findAllVoitureGarageClient,
+    annulerVoitureDevis,
+    validerVoitureDevis
 }
 
 async function findAllVoiture(req, res) {
@@ -49,7 +53,7 @@ async function ajoutVoitureClient(req,res){
 
 async function depotVoitureGarage(req,res){
     try{
-        await VoitureGarageService.depotVoitureGarage(req.body?.voiture_uuid);
+        await VoitureGarageService.depotVoitureGarage(req.utilisateur, req.body?.voiture_uuid);
         res.json(normalizeApiResponse({status: httpStatus.CREATED, data:[]})).status(httpStatus.OK);
     }
     catch(err){
@@ -89,6 +93,42 @@ async function ajoutVoitureDevis(req,res){
         else{
             res.json(normalizeApiResponse({errors: err.message,status: httpStatus.UNAUTHORIZED})).status(httpStatus.OK);
         }
+    }
+}
+
+async function findDetailsVoitureDevis(req, res) {
+    try {
+        let voitures = await VoitureDevisService.findDetailsVoitureDevis(req.utilisateur, req.query.voiture_garage_uuid);
+        res.json(normalizeApiResponse({data: {voitures: voitures}})).status(Constant.HTTP_SUCCESS);
+    } catch (e) {
+        res.json(normalizeApiResponse({errors: e.message,status: Constant.HTTP_BAD_REQUEST})).status(Constant.HTTP_SUCCESS);
+    }
+}
+
+async function findAllVoitureGarageClient(req, res){
+    try {
+        let voitures = await VoitureGarageService.findAllVoitureGarageClient(req.utilisateur);
+        res.json(normalizeApiResponse({data: {voitures: voitures}})).status(Constant.HTTP_SUCCESS);
+    } catch (e) {
+        res.json(normalizeApiResponse({errors: e.message,status: Constant.HTTP_BAD_REQUEST})).status(Constant.HTTP_SUCCESS);
+    }
+}
+
+async function annulerVoitureDevis(req, res){
+    try {
+        await VoitureDevisService.annulerVoitureDevis(req.body?.voiture_devis_uuid);
+        res.json(normalizeApiResponse({data: {}})).status(Constant.HTTP_SUCCESS);
+    } catch (e) {
+        res.json(normalizeApiResponse({errors: e.message,status: Constant.HTTP_BAD_REQUEST})).status(Constant.HTTP_SUCCESS);
+    }
+}
+
+async function validerVoitureDevis(req, res){
+    try {
+        await VoitureDevisService.validerVoitureDevis(req.body?.voiture_devis_uuid);
+        res.json(normalizeApiResponse({data: {}})).status(Constant.HTTP_SUCCESS);
+    } catch (e) {
+        res.json(normalizeApiResponse({errors: e.message,status: Constant.HTTP_BAD_REQUEST})).status(Constant.HTTP_SUCCESS);
     }
 }
 

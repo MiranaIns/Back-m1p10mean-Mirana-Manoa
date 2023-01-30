@@ -9,5 +9,9 @@ router.post('/', authMiddleware(), VoitureController.ajoutVoitureClient);
 router.post('/garage/', authMiddleware(), VoitureController.depotVoitureGarage);
 router.get('/garage/', ratAuthMiddleware(), VoitureController.findAllVoitureGarage);
 router.post('/devis/', ratAuthMiddleware(), VoitureController.ajoutVoitureDevis);
+router.get('/devis/', authMiddleware(), VoitureController.findDetailsVoitureDevis);
+router.get('/garage/client', authMiddleware(), VoitureController.findAllVoitureGarageClient);
+router.post('/devis/annuler', authMiddleware(), VoitureController.annulerVoitureDevis);
+router.post('/devis/valider', authMiddleware(), VoitureController.validerVoitureDevis);
 
 module.exports = router;

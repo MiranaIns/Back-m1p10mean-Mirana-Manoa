@@ -7,7 +7,8 @@ const VoitureService = {
     findAllVoiture,
     ajoutVoitureClient,
     findByUuid,
-    updateVoitureGarageStatus
+    updateVoitureGarageStatus,
+    findById
 };
 
 const db = Database.getInstance();
@@ -74,15 +75,37 @@ async function findByUuid(uuid){
     }
 }
 
-async function updateVoitureGarageStatus(voiture_uuid){
+async function updateVoitureGarageStatus(voiture_uuid, status){
     try {
         return db.then(async (db) => {
             const collection = db.collection(collectionName);
             const updateResult = await collection.updateOne(
                 { "voiture_uuid": voiture_uuid },
-                { $set: { "voiture_etat_garage": true } }
+                { $set: { "voiture_etat_garage": status } }
             );
             return updateResult;
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function findById(id){
+    try {
+        return db.then((db) => {
+            const collection = db.collection(collectionName);
+            return new Promise((resolve, reject) => {
+                collection.findOne({_id: ObjectId(id)}, (err, voiture) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    if (!voiture) {
+                        reject(new Error("Error find voiture by id"));
+                    }
+                    resolve(voiture);
+                });
+            });
         });
     }
     catch (e){
