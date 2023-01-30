@@ -8,5 +8,6 @@ router.get('/', authMiddleware(), VoitureController.findAllVoiture);
 router.post('/', authMiddleware(), VoitureController.ajoutVoitureClient);
 router.post('/garage/', authMiddleware(), VoitureController.depotVoitureGarage);
 router.get('/garage/', ratAuthMiddleware(), VoitureController.findAllVoitureGarage);
+router.post('/devis/', ratAuthMiddleware(), VoitureController.ajoutVoitureDevis);
 
 module.exports = router;

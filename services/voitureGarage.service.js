@@ -6,7 +6,9 @@ const VoitureService = require("./voiture.service");
 
 const VoitureGarageService = {
     depotVoitureGarage,
-    findAllVoitureGarage
+    findAllVoitureGarage,
+    findByUuid,
+    updateVoitureGarageAvancement
 };
 
 const db = Database.getInstance();
@@ -58,6 +60,44 @@ async function findAllVoitureGarage(avancement){
                     return results;
                 });
             });
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function findByUuid(uuid){
+    try {
+        return db.then((db) => {
+            const collection = db.collection(collectionName);
+            return new Promise((resolve, reject) => {
+                collection.findOne({voiture_garage_uuid: uuid}, (err, voiture) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    if (!voiture) {
+                        reject(new Error("Error find voitureGarage by uuid"));
+                    }
+                    resolve(voiture);
+                });
+            });
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function updateVoitureGarageAvancement(value, voituregarageuuid){
+    try {
+        return db.then(async (db) => {
+            const collection = db.collection(collectionName);
+            const updateResult = await collection.updateOne(
+                { "voiture_garage_uuid": voituregarageuuid },
+                { $set: { "voiture_garage_avancement": value } }
+            );
+            return updateResult;
         });
     }
     catch (e){
