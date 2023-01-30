@@ -15,7 +15,7 @@ const db = Database.getInstance();
 
 const collectionName = 'voiture_garage';
 
-async function depotVoitureGarage(voitureUuid){
+async function depotVoitureGarage(user, voitureUuid){
     try {
         let options = {};
         return db.then(async (db) => {
@@ -25,6 +25,7 @@ async function depotVoitureGarage(voitureUuid){
             const insertResult = await collection.insertOne(
                 {
                     "fk_voiture_id": voiture._id,
+                    "fk_utilisateur_id": user._id,
                     "voiture_garage_uuid": v4(),
                     "voiture_garage_avancement": "Dépot",
                     "voiture_garage_date_depot": new Date(),
@@ -52,6 +53,8 @@ async function findAllVoitureGarage(avancement){
                     return collection.findOne({"_id": ObjectId(garage.fk_voiture_id)}).then(voiture => {
                         delete garage._id;
                         delete voiture._id;
+                        delete voiture.fk_utilisateur_id;
+                        delete garage.fk_voiture_id;
                         garage.voiture_details = voiture;
                         return garage;
                     });
@@ -98,6 +101,33 @@ async function updateVoitureGarageAvancement(value, voituregarageuuid){
                 { $set: { "voiture_garage_avancement": value } }
             );
             return updateResult;
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function findVoitureGarage(avancement){
+    try {
+        return db.then((db) => {
+            const collection = db.collection(collectionName);
+            return collection.find({"voiture_garage_date_recuperation": null, "voiture_garage_avancement": avancement}).toArray().then(garageResults => {
+                const collection = db.collection("voiture");
+                let promises = garageResults.map(async (garage) => {
+                    return collection.findOne({"_id": ObjectId(garage.fk_voiture_id)}).then(voiture => {
+                        delete garage._id;
+                        delete voiture._id;
+                        delete voiture.fk_utilisateur_id;
+                        delete garage.fk_voiture_id;
+                        garage.voiture_details = voiture;
+                        return garage;
+                    });
+                });
+                return Promise.all(promises).then(results => {
+                    return results;
+                });
+            });
         });
     }
     catch (e){
