@@ -5,18 +5,20 @@ const {v4} = require("uuid");
 
 const VoitureService = {
     findAllVoiture,
-    ajoutVoitureClient
+    ajoutVoitureClient,
+    findByUuid,
+    updateVoitureGarageStatus
 };
 
 const db = Database.getInstance();
 
 const collectionName = 'voiture';
 
-async function findAllVoiture(user){
+async function findAllVoiture(user, etat){
     try {
         return db.then((db) => {
             const collection = db.collection(collectionName);
-            return collection.find({"fk_utilisateur_id": ObjectId(user._id)}).toArray().then(results => {
+            return collection.find({"fk_utilisateur_id": ObjectId(user._id), "voiture_etat_garage": JSON.parse(etat)}).toArray().then(results => {
                 return results;
             });
         });
@@ -43,6 +45,44 @@ async function ajoutVoitureClient(user, voiture){
                 },
                 { options });
             return insertResult.insertedId;
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function findByUuid(uuid){
+    try {
+        return db.then((db) => {
+            const collection = db.collection(collectionName);
+            return new Promise((resolve, reject) => {
+                collection.findOne({voiture_uuid: uuid}, (err, voiture) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    if (!voiture) {
+                        reject(new Error("Error find voiture by uuid"));
+                    }
+                    resolve(voiture);
+                });
+            });
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function updateVoitureGarageStatus(voiture_uuid){
+    try {
+        return db.then(async (db) => {
+            const collection = db.collection(collectionName);
+            const updateResult = await collection.updateOne(
+                { "voiture_uuid": voiture_uuid },
+                { $set: { "voiture_etat_garage": true } }
+            );
+            return updateResult;
         });
     }
     catch (e){
