@@ -62,7 +62,7 @@ async function depotVoitureGarage(req,res){
 
 async function findAllVoitureGarage(req, res) {
     try {
-        let voitures = await VoitureGarageService.findAllVoitureGarage();
+        let voitures = await VoitureGarageService.findAllVoitureGarage(req.query.avancement);
         res.json(normalizeApiResponse({data: {voitures: voitures}})).status(Constant.HTTP_SUCCESS);
     } catch (e) {
         res.json(normalizeApiResponse({errors: e.message,status: Constant.HTTP_BAD_REQUEST})).status(Constant.HTTP_SUCCESS);

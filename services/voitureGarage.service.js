@@ -40,11 +40,11 @@ async function depotVoitureGarage(voitureUuid){
     }
 }
 
-async function findAllVoitureGarage(){
+async function findAllVoitureGarage(avancement){
     try {
         return db.then((db) => {
             const collection = db.collection(collectionName);
-            return collection.find({"voiture_garage_date_recuperation": null}).toArray().then(garageResults => {
+            return collection.find({"voiture_garage_date_recuperation": null, "voiture_garage_avancement": avancement}).toArray().then(garageResults => {
                 const collection = db.collection("voiture");
                 let promises = garageResults.map(async (garage) => {
                     return collection.findOne({"_id": ObjectId(garage.fk_voiture_id)}).then(voiture => {
