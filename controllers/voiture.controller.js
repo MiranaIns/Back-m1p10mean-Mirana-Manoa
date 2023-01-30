@@ -16,7 +16,8 @@ const VoitureController = {
     ajoutVoitureDevis,
     findDetailsVoitureDevis,
     findAllVoitureGarageClient,
-    annulerVoitureDevis
+    annulerVoitureDevis,
+    validerVoitureDevis
 }
 
 async function findAllVoiture(req, res) {
@@ -116,6 +117,15 @@ async function findAllVoitureGarageClient(req, res){
 async function annulerVoitureDevis(req, res){
     try {
         await VoitureDevisService.annulerVoitureDevis(req.body?.voiture_devis_uuid);
+        res.json(normalizeApiResponse({data: {}})).status(Constant.HTTP_SUCCESS);
+    } catch (e) {
+        res.json(normalizeApiResponse({errors: e.message,status: Constant.HTTP_BAD_REQUEST})).status(Constant.HTTP_SUCCESS);
+    }
+}
+
+async function validerVoitureDevis(req, res){
+    try {
+        await VoitureDevisService.validerVoitureDevis(req.body?.voiture_devis_uuid);
         res.json(normalizeApiResponse({data: {}})).status(Constant.HTTP_SUCCESS);
     } catch (e) {
         res.json(normalizeApiResponse({errors: e.message,status: Constant.HTTP_BAD_REQUEST})).status(Constant.HTTP_SUCCESS);

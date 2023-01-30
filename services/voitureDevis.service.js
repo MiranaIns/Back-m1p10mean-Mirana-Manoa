@@ -3,13 +3,15 @@ const Constant = require("../utils/constant.util");
 const {ObjectId} = require("mongodb");
 const {v4} = require("uuid");
 const VoitureGarageService = require("./voitureGarage.service");
-const ResponsableAtelierService = require("./rat.service")
-const VoitureService = require("./voiture.service")
+const ResponsableAtelierService = require("./rat.service");
+const VoitureService = require("./voiture.service");
+const VoitureReparationService = require("./voitureReparation.service");
 
 const VoitureDevisService = {
     ajoutVoitureDevis,
     findDetailsVoitureDevis,
-    annulerVoitureDevis
+    annulerVoitureDevis,
+    validerVoitureDevis
 };
 
 const db = Database.getInstance();
@@ -102,7 +104,7 @@ async function findByUuid(uuid){
                         reject(err);
                     }
                     if (!voiture) {
-                        reject(new Error("Error find voitureGarage by uuid"));
+                        reject(new Error("Error find voiture devis by uuid"));
                     }
                     resolve(voiture);
                 });
@@ -138,6 +140,21 @@ async function annulerVoitureDevis(voitureDevisUuid){
         await updateVoitureDevisEtat(voitureDevisUuid, "annuler");
         await VoitureGarageService.updateVoitureGarageDateRecuperation(voitureGarage.voiture_garage_uuid);
         await VoitureService.updateVoitureGarageStatus(voiture.uuid, false);
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function validerVoitureDevis(voitureDevisUuid){
+    try {
+        const voitureDevis = await findByUuid(voitureDevisUuid);
+        const voitureGarage = await VoitureGarageService.findById(voitureDevis.fk_voiture_garage_id);
+        await updateVoitureDevisEtat(voitureDevisUuid, "valider");
+        await VoitureGarageService.updateVoitureGarageAvancement("reparation", voitureGarage.voiture_garage_uuid);
+        await VoitureGarageService.updateVoitureGarageDateDebutReparation(voitureGarage.voiture_garage_uuid);
+        await VoitureReparationService.insertManyReparations(voitureDevis.voiture_devis_reparations, voitureDevis._id);
+
     }
     catch (e){
         throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};

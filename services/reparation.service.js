@@ -66,4 +66,6 @@ async function findByUuid(uuid){
         throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
     }
 }
+
+
 module.exports = ReparationService;

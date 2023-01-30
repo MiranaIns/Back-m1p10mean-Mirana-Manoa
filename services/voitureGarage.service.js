@@ -11,7 +11,8 @@ const VoitureGarageService = {
     updateVoitureGarageAvancement,
     findAllVoitureGarageClient,
     updateVoitureGarageDateRecuperation,
-    findById
+    findById,
+    updateVoitureGarageDateDebutReparation
 };
 
 const db = Database.getInstance();
@@ -169,6 +170,22 @@ async function findById(id){
                     resolve(voiture);
                 });
             });
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function updateVoitureGarageDateDebutReparation(voituregarageuuid){
+    try {
+        return db.then(async (db) => {
+            const collection = db.collection(collectionName);
+            const updateResult = await collection.updateOne(
+                { "voiture_garage_uuid": voituregarageuuid },
+                { $set: { "voiture_garage_date_debut_reparation": new Date()} }
+            );
+            return updateResult;
         });
     }
     catch (e){
