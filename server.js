@@ -1,26 +1,29 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const MongoClient = require('mongodb').MongoClient
+const cors = require('cors');
 const app = express();
 const configureRouter = require('./config/router.config')
+const notFoundMiddleware = require("./middlewares/notFound.middleware");
+const errorMiddleware = require("./middlewares/error.middleware");
+const passport = require('passport');
+const { jwtStrategy, jwtStrategyRat, jwtStrategyRfi } = require('./config/passport.config');
 
-const connectionString = 'mongodb+srv://mongo:mongo@cluster0.ih3purh.mongodb.net/?retryWrites=true&w=majority'
+/* Middlewares */
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+app.use(cors());
+app.options('*',cors());
 
-MongoClient.connect(connectionString, { useUnifiedTopology: true })
-    .then(client => {
-        console.log('Connected to Database ...');
-        const db = client.db('m1p10mean');
-        app.set('db', db);
+app.use(passport.initialize());
+passport.use('jwt', jwtStrategy);
+passport.use('jwtRat', jwtStrategyRat);
+passport.use('jwtRfi', jwtStrategyRfi);
+/* Router */
+configureRouter(app);
 
-        /* Middlewares */
-        app.use(bodyParser.urlencoded({extended: true}));
-        app.use(bodyParser.json());
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
 
-        /* Router */
-        configureRouter(app);
-
-        app.listen(3000, function () {
-            console.log('Listening on 3000 ...');
-        });
-    })
-    .catch(console.error)
+app.listen(3000, function () {
+    console.log('Listening on 3000 ...');
+});
