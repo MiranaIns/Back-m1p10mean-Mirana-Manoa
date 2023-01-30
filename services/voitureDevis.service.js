@@ -139,7 +139,7 @@ async function annulerVoitureDevis(voitureDevisUuid){
         const voiture = await VoitureService.findById(voitureGarage.fk_voiture_id);
         await updateVoitureDevisEtat(voitureDevisUuid, "annuler");
         await VoitureGarageService.updateVoitureGarageDateRecuperation(voitureGarage.voiture_garage_uuid);
-        await VoitureService.updateVoitureGarageStatus(voiture.uuid, false);
+        await VoitureService.updateVoitureGarageStatus(voiture.voiture_uuid, false);
     }
     catch (e){
         throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
