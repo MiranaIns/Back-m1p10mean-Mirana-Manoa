@@ -10,7 +10,8 @@ const VoitureGarageService = require("../services/voitureGarage.service");
 const VoitureController = {
     findAllVoiture,
     ajoutVoitureClient,
-    depotVoitureGarage
+    depotVoitureGarage,
+    findAllVoitureGarage
 }
 
 async function findAllVoiture(req, res) {
@@ -59,4 +60,12 @@ async function depotVoitureGarage(req,res){
     }
 }
 
+async function findAllVoitureGarage(req, res) {
+    try {
+        let voitures = await VoitureGarageService.findAllVoitureGarage();
+        res.json(normalizeApiResponse({data: {voitures: voitures}})).status(Constant.HTTP_SUCCESS);
+    } catch (e) {
+        res.json(normalizeApiResponse({errors: e.message,status: Constant.HTTP_BAD_REQUEST})).status(Constant.HTTP_SUCCESS);
+    }
+}
 module.exports = VoitureController;
