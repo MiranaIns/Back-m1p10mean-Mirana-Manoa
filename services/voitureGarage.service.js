@@ -12,7 +12,8 @@ const VoitureGarageService = {
     findAllVoitureGarageClient,
     updateVoitureGarageDateRecuperation,
     findById,
-    updateVoitureGarageDateDebutReparation
+    updateVoitureGarageDateDebutReparation,
+    updateVoitureGarageDateFinReparation
 };
 
 const db = Database.getInstance();
@@ -116,7 +117,7 @@ async function findAllVoitureGarageClient(user){
     try {
         return db.then((db) => {
             const collection = db.collection(collectionName);
-            return collection.find({"fk_utilisateur_id": ObjectId(user._id)}).toArray().then(garageResults => {
+            return collection.find({"fk_utilisateur_id": ObjectId(user._id), "voiture_garage_date_recuperation": null}).toArray().then(garageResults => {
                 const collection = db.collection("voiture");
                 let promises = garageResults.map(async (garage) => {
                     return collection.findOne({"_id": ObjectId(garage.fk_voiture_id), "voiture_etat_garage": true}).then(voiture => {
@@ -184,6 +185,22 @@ async function updateVoitureGarageDateDebutReparation(voituregarageuuid){
             const updateResult = await collection.updateOne(
                 { "voiture_garage_uuid": voituregarageuuid },
                 { $set: { "voiture_garage_date_debut_reparation": new Date()} }
+            );
+            return updateResult;
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function updateVoitureGarageDateFinReparation(voituregarageuuid){
+    try {
+        return db.then(async (db) => {
+            const collection = db.collection(collectionName);
+            const updateResult = await collection.updateOne(
+                { "voiture_garage_uuid": voituregarageuuid },
+                { $set: { "voiture_garage_date_fin_reparation": new Date()} }
             );
             return updateResult;
         });

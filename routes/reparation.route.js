@@ -7,5 +7,6 @@ router.get('/', ratAuthMiddleware(), ReparationController.findAllReparation);
 router.get('/a-faire', ratAuthMiddleware(), ReparationController.findReparationAFaire);
 router.post('/commencer', ratAuthMiddleware(), ReparationController.commencerReparationVoiture);
 router.get('/en-cours', ratAuthMiddleware(), ReparationController.findReparationEnCours);
+router.post('/terminer', ratAuthMiddleware(), ReparationController.terminerReparationVoiture);
 
 module.exports = router;

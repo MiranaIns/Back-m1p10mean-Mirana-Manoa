@@ -11,7 +11,8 @@ const VoitureDevisService = {
     ajoutVoitureDevis,
     findDetailsVoitureDevis,
     annulerVoitureDevis,
-    validerVoitureDevis
+    validerVoitureDevis,
+    findById
 };
 
 const db = Database.getInstance();
@@ -139,7 +140,7 @@ async function annulerVoitureDevis(voitureDevisUuid){
         const voiture = await VoitureService.findById(voitureGarage.fk_voiture_id);
         await updateVoitureDevisEtat(voitureDevisUuid, "annuler");
         await VoitureGarageService.updateVoitureGarageDateRecuperation(voitureGarage.voiture_garage_uuid);
-        await VoitureService.updateVoitureGarageStatus(voiture.uuid, false);
+        await VoitureService.updateVoitureGarageStatus(voiture.voiture_uuid, false);
     }
     catch (e){
         throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
@@ -155,6 +156,28 @@ async function validerVoitureDevis(voitureDevisUuid){
         await VoitureGarageService.updateVoitureGarageDateDebutReparation(voitureGarage.voiture_garage_uuid);
         await VoitureReparationService.insertManyReparations(voitureDevis.voiture_devis_reparations, voitureDevis._id);
 
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function findById(id){
+    try {
+        return db.then((db) => {
+            const collection = db.collection(collectionName);
+            return new Promise((resolve, reject) => {
+                collection.findOne({_id: ObjectId(id)}, (err, devis) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    if (!devis) {
+                        reject(new Error("Error find voiture devis by id"));
+                    }
+                    resolve(devis);
+                });
+            });
+        });
     }
     catch (e){
         throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};

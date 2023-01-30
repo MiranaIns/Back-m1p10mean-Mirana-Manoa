@@ -81,7 +81,7 @@ async function updateVoitureGarageStatus(voiture_uuid, status){
             const collection = db.collection(collectionName);
             const updateResult = await collection.updateOne(
                 { "voiture_uuid": voiture_uuid },
-                { $set: { "voiture_etat_garage": status } }
+                { $set: { "voiture_etat_garage": status} }
             );
             return updateResult;
         });
