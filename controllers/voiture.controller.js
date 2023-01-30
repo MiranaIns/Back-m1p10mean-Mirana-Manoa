@@ -14,7 +14,8 @@ const VoitureController = {
     depotVoitureGarage,
     findAllVoitureGarage,
     ajoutVoitureDevis,
-    findDetailsVoitureDevis
+    findDetailsVoitureDevis,
+    findAllVoitureGarageClient
 }
 
 async function findAllVoiture(req, res) {
@@ -96,6 +97,15 @@ async function ajoutVoitureDevis(req,res){
 async function findDetailsVoitureDevis(req, res) {
     try {
         let voitures = await VoitureDevisService.findDetailsVoitureDevis(req.utilisateur, req.query.voiture_garage_uuid);
+        res.json(normalizeApiResponse({data: {voitures: voitures}})).status(Constant.HTTP_SUCCESS);
+    } catch (e) {
+        res.json(normalizeApiResponse({errors: e.message,status: Constant.HTTP_BAD_REQUEST})).status(Constant.HTTP_SUCCESS);
+    }
+}
+
+async function findAllVoitureGarageClient(req, res){
+    try {
+        let voitures = await VoitureGarageService.findAllVoitureGarageClient(req.utilisateur);
         res.json(normalizeApiResponse({data: {voitures: voitures}})).status(Constant.HTTP_SUCCESS);
     } catch (e) {
         res.json(normalizeApiResponse({errors: e.message,status: Constant.HTTP_BAD_REQUEST})).status(Constant.HTTP_SUCCESS);

@@ -8,7 +8,8 @@ const VoitureGarageService = {
     depotVoitureGarage,
     findAllVoitureGarage,
     findByUuid,
-    updateVoitureGarageAvancement
+    updateVoitureGarageAvancement,
+    findAllVoitureGarageClient
 };
 
 const db = Database.getInstance();
@@ -108,14 +109,14 @@ async function updateVoitureGarageAvancement(value, voituregarageuuid){
     }
 }
 
-async function findVoitureGarage(avancement){
+async function findAllVoitureGarageClient(user){
     try {
         return db.then((db) => {
             const collection = db.collection(collectionName);
-            return collection.find({"voiture_garage_date_recuperation": null, "voiture_garage_avancement": avancement}).toArray().then(garageResults => {
+            return collection.find().toArray().then(garageResults => {
                 const collection = db.collection("voiture");
                 let promises = garageResults.map(async (garage) => {
-                    return collection.findOne({"_id": ObjectId(garage.fk_voiture_id)}).then(voiture => {
+                    return collection.findOne({"fk_utilisateur_id": ObjectId(user._id), "voiture_etat_garage": true}).then(voiture => {
                         delete garage._id;
                         delete voiture._id;
                         delete voiture.fk_utilisateur_id;
