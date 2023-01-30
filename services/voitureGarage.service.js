@@ -113,10 +113,10 @@ async function findAllVoitureGarageClient(user){
     try {
         return db.then((db) => {
             const collection = db.collection(collectionName);
-            return collection.find().toArray().then(garageResults => {
+            return collection.find({"fk_utilisateur_id": ObjectId(user._id)}).toArray().then(garageResults => {
                 const collection = db.collection("voiture");
                 let promises = garageResults.map(async (garage) => {
-                    return collection.findOne({"fk_utilisateur_id": ObjectId(user._id), "voiture_etat_garage": true}).then(voiture => {
+                    return collection.findOne({"_id": ObjectId(garage.fk_voiture_id), "voiture_etat_garage": true}).then(voiture => {
                         delete garage._id;
                         delete voiture._id;
                         delete voiture.fk_utilisateur_id;
