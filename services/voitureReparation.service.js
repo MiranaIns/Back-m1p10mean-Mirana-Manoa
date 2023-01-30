@@ -7,7 +7,8 @@ const ReparationService = require("./reparation.service")
 const VoitureReparationService = {
     insertManyReparations,
     findReparationAFaire,
-    commencerReparationVoiture
+    commencerReparationVoiture,
+    findReparationEnCours
 };
 
 const db = Database.getInstance();
@@ -106,6 +107,34 @@ async function commencerReparationVoiture(user, voiture_reparation_uuid){
                 { $set: { "fk_responsable_atelier_id": user._id, "voiture_reparation_date_debut": new Date()} }
             );
             return updateResult;
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function findReparationEnCours(user){
+    try {
+        return db.then((db) => {
+            const collection = db.collection(collectionName);
+            return collection.find({"fk_responsable_atelier_id": ObjectId(user._id), "voiture_reparation_date_fin": null}).toArray().then(results => {
+                const collection = db.collection("reparation");
+                let promises = results.map(async (result) => {
+                    return collection.findOne({"_id": ObjectId(result.fk_reparation_id)}).then(reparation => {
+                        delete result._id;
+                        delete result.fk_reparation_id;
+                        delete result.fk_responsable_atelier_id;
+                        delete result.fk_voiture_devis_id;
+                        delete reparation._id;
+                        result.reparation_details = reparation;
+                        return result;
+                    });
+                });
+                return Promise.all(promises).then(results => {
+                    return results;
+                });
+            });
         });
     }
     catch (e){
