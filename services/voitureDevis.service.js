@@ -4,11 +4,12 @@ const {ObjectId} = require("mongodb");
 const {v4} = require("uuid");
 const VoitureGarageService = require("./voitureGarage.service");
 const ResponsableAtelierService = require("./rat.service")
-const ReparationService = require("./reparation.service")
+const VoitureService = require("./voiture.service")
 
 const VoitureDevisService = {
     ajoutVoitureDevis,
-    findDetailsVoitureDevis
+    findDetailsVoitureDevis,
+    annulerVoitureDevis
 };
 
 const db = Database.getInstance();
@@ -85,6 +86,58 @@ async function findDetailsVoitureDevis(user, voitureGarageUuid){
                 });
             });
         });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function findByUuid(uuid){
+    try {
+        return db.then((db) => {
+            const collection = db.collection(collectionName);
+            return new Promise((resolve, reject) => {
+                collection.findOne({voiture_devis_uuid: uuid}, (err, voiture) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    if (!voiture) {
+                        reject(new Error("Error find voitureGarage by uuid"));
+                    }
+                    resolve(voiture);
+                });
+            });
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function updateVoitureDevisEtat(voitureDevisUuid, etat){
+    try {
+        return db.then(async (db) => {
+            const collection = db.collection(collectionName);
+            const updateResult = await collection.updateOne(
+                { "voiture_devis_uuid": voitureDevisUuid },
+                { $set: { "voiture_devis_etat": etat } }
+            );
+            return updateResult;
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function annulerVoitureDevis(voitureDevisUuid){
+    try {
+        const voitureDevis = await findByUuid(voitureDevisUuid);
+        const voitureGarage = await VoitureGarageService.findById(voitureDevis.fk_voiture_garage_id);
+        const voiture = await VoitureService.findById(voitureGarage.fk_voiture_id);
+        await updateVoitureDevisEtat(voitureDevisUuid, "annuler");
+        await VoitureGarageService.updateVoitureGarageDateRecuperation(voitureGarage.voiture_garage_uuid);
+        await VoitureService.updateVoitureGarageStatus(voiture.uuid, false);
     }
     catch (e){
         throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};

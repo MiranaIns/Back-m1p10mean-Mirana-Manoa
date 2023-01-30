@@ -9,7 +9,9 @@ const VoitureGarageService = {
     findAllVoitureGarage,
     findByUuid,
     updateVoitureGarageAvancement,
-    findAllVoitureGarageClient
+    findAllVoitureGarageClient,
+    updateVoitureGarageDateRecuperation,
+    findById
 };
 
 const db = Database.getInstance();
@@ -22,7 +24,7 @@ async function depotVoitureGarage(user, voitureUuid){
         return db.then(async (db) => {
             const collection = db.collection(collectionName);
             const voiture = await VoitureService.findByUuid(voitureUuid);
-            await VoitureService.updateVoitureGarageStatus(voitureUuid);
+            await VoitureService.updateVoitureGarageStatus(voitureUuid, true);
             const insertResult = await collection.insertOne(
                 {
                     "fk_voiture_id": voiture._id,
@@ -127,6 +129,44 @@ async function findAllVoitureGarageClient(user){
                 });
                 return Promise.all(promises).then(results => {
                     return results;
+                });
+            });
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function updateVoitureGarageDateRecuperation(voituregarageuuid){
+    try {
+        return db.then(async (db) => {
+            const collection = db.collection(collectionName);
+            const updateResult = await collection.updateOne(
+                { "voiture_garage_uuid": voituregarageuuid },
+                { $set: { "voiture_garage_date_recuperation": new Date()} }
+            );
+            return updateResult;
+        });
+    }
+    catch (e){
+        throw {status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message};
+    }
+}
+
+async function findById(id){
+    try {
+        return db.then((db) => {
+            const collection = db.collection(collectionName);
+            return new Promise((resolve, reject) => {
+                collection.findOne({_id: ObjectId(id)}, (err, voiture) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    if (!voiture) {
+                        reject(new Error("Error find voiture garage by id"));
+                    }
+                    resolve(voiture);
                 });
             });
         });

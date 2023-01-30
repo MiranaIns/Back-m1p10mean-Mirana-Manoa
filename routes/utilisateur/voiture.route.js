@@ -11,5 +11,6 @@ router.get('/garage/', ratAuthMiddleware(), VoitureController.findAllVoitureGara
 router.post('/devis/', ratAuthMiddleware(), VoitureController.ajoutVoitureDevis);
 router.get('/devis/', authMiddleware(), VoitureController.findDetailsVoitureDevis);
 router.get('/garage/client', authMiddleware(), VoitureController.findAllVoitureGarageClient);
+router.post('/devis/annuler', authMiddleware(), VoitureController.annulerVoitureDevis);
 
 module.exports = router;
