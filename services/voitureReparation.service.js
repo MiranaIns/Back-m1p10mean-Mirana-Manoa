@@ -1,6 +1,5 @@
 const Database = require('../database');
 const Constant = require("../utils/constant.util");
-const {ObjectId} = require("mongodb");
 const {v4} = require("uuid");
 const ReparationService = require("./reparation.service");
 const VoitureGarageService = require("./voitureGarage.service");
@@ -149,15 +148,15 @@ async function terminerReparationVoiture(user, voiture_reparation_uuid){
     try {
         return db.then(async (db) => {
             const collection = db.collection(collectionName);
-
-            // const voiture_reparation = await findByUuid(voiture_reparation_uuid);
-            // const voiture_devis= await VoitureDevisService.findById(voiture_reparation.fk_voiture_devis_id);
-            // const endReparationVoiture = await checkEndReparation(voiture_devis._id);
-            // const voitureGarage = await VoitureGarageService.findById(voiture_devis.fk_voiture_garage_id);
-            // console.log(endReparationVoiture);
-            // if (endReparationVoiture){
-            //     await VoitureGarageService.updateVoitureGarageDateFinReparation(voitureGarage.voiture_garage_uuid);
-            // }
+            const voiture_reparation = await findByUuid(voiture_reparation_uuid);
+            const endReparationVoiture = await checkEndReparation(voiture_reparation.fk_voiture_devis_id);
+            const voitureDevis = await VoitureDevisService.findById(voiture_reparation.fk_voiture_devis_id);
+            const voitureGarage = await VoitureGarageService.findById(voitureDevis.fk_voiture_garage_id);
+            console.log(endReparationVoiture);
+            if (endReparationVoiture){
+                console.log("hoho")
+                await VoitureGarageService.updateVoitureGarageDateFinReparation(voitureGarage.voiture_garage_uuid);
+            }
             const updateResult = await collection.updateOne(
                 { "voiture_reparation_uuid": voiture_reparation_uuid, "fk_responsable_atelier_id": user._id},
                 { $set: {"voiture_reparation_date_fin": new Date()} }
@@ -178,7 +177,7 @@ async function checkEndReparation(fk_voiture_devis_id) {
                 "fk_voiture_devis_id": fk_voiture_devis_id,
                 "voiture_reparation_date_fin": null
             }).toArray();
-            return results.length === 0;
+            return results.length === 1;
         });
     } catch (e) {
         throw { status: Constant.HTTP_INTERNAL_SERVER_ERROR, message: e.message };

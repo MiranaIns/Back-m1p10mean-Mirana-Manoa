@@ -167,14 +167,14 @@ async function findById(id){
         return db.then((db) => {
             const collection = db.collection(collectionName);
             return new Promise((resolve, reject) => {
-                collection.findOne({_id: ObjectId(id)}, (err, devis) => {
+                collection.findOne({_id: ObjectId(id)}, (err, voiture) => {
                     if (err) {
                         reject(err);
                     }
-                    if (!devis) {
+                    if (!voiture) {
                         reject(new Error("Error find voiture devis by id"));
                     }
-                    resolve(devis);
+                    resolve(voiture);
                 });
             });
         });
